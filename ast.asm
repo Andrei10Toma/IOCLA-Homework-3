@@ -7,11 +7,11 @@ section .bss
 
 section .text
 
-extern create_node
-extern printf
 extern strtok
 extern evaluate_ast
 extern strlen
+extern calloc
+extern strdup
 global create_tree
 global iocla_atoi
 
@@ -32,7 +32,7 @@ iocla_atoi: ; converting a string into an integer
 int_converter:
     mov     dl, byte[ebx + ecx]
     push    ecx
-    sub     dl, '0' ; converting the character in string
+    sub     dl, '0' ; converting the extracted character to int
     push    edx     
     mov     ecx, 10 ; adding to the final number
     mul     ecx
@@ -45,10 +45,26 @@ end_int_converter:
     jl      int_converter ; iterate through the string until the end of it
     cmp     byte[ebx], '-'
     jne     end
-    mov     ecx, -1 ; if th efirst character was '-' make the number negative
+    mov     ecx, -1 ; if the first character was '-' make the number negative
     mul     ecx
 end:
+    leave
+    ret
+
+
+my_create_node: ; allocating space for a node
+    enter   0, 0
+    push    1
+    push    16
+    call    calloc ; allocating 16 bytes for a node
+    add     esp, 8
     push    eax
+    push    dword[ebp + 8]
+    call    strdup
+    add     esp, 4
+    mov     ecx, eax
+    pop     eax
+    mov     [eax], ecx ; copy the string in data
     leave
     ret
 
@@ -74,17 +90,17 @@ start_create_tree:
     jmp     number_case
 
 operator_case: ; the current node is an operator
-    cmp     byte[ecx + 1], 0 ; verifying if the number is negative
+    cmp     byte[ecx + 1], 0 ; verifying if it is a negative number
     jne     number_case
     push    delim
     push    0
     call    strtok
     add     esp, 8
     push    eax
-    call    create_node ; allocating space for the new node
+    call    my_create_node ; allocating space for the new node
     add     esp, 4
     pop     ecx
-    mov     [ecx + 4], eax ; put the new node in the left of the current node
+    mov     [ecx + 4], eax ; connect the new node in the left of the current node
     push    ecx
     push    dword[ecx + 4]
     call    start_create_tree ; enter recursion on the left side of the current node
@@ -94,16 +110,13 @@ operator_case: ; the current node is an operator
     call    strtok
     add     esp, 8
     push    eax
-    call    create_node ; allocating space for the new node
+    call    my_create_node ; allocating space for the new node
     add     esp, 4
     pop     ecx
-    mov     [ecx + 8], eax ; put the new node in the right of the current node
+    mov     [ecx + 8], eax ; connect the new node in the right of the current node
     push    dword[ecx + 8]
     call    start_create_tree ; enters in recursion on the right side of the current node
     add     esp, 4
-
-    leave
-    ret
 
 number_case: ; returns from recursion when the current node is a number
     leave
@@ -118,14 +131,13 @@ create_tree:
     call    strtok
     add     esp, 8
     push    eax
-    call    create_node ; allocating space for the node
+    call    my_create_node ; allocating space for the node
     add     esp, 4
     mov     [root], eax ; set the root
     push    eax
     call    start_create_tree ; the function that creates the ast
     add     esp, 4
     popa
-    xor     eax, eax
     mov     eax, [root] ; return the tree in eax
     leave
     ret

@@ -1,0 +1,37 @@
+Toma Andrei 321CB
+_______________________________________________________________________________
+
+    Firstly, I will talk about the iocla_atoi function and, then, about the
+process of creating the ast.
+_______________________________________________________________________________
+
+    iocla_atoi:
+    First, I will get the length of the string that will be converted to int.
+Then if the number is negative I wiil start the iteration through string from
+index 1. I am extracting every character from the string and converting it to
+int and then I am adding the extracted number from the string to the returned
+value (eax). If the number is negative, in the end I will multiply it with -1.
+
+_______________________________________________________________________________
+
+    Creating the ast:
+    The root of the ast will be always the first extracted string from the
+given preorder traverssal and then I will call the start_create_tree function, 
+that will actually build the whole tree. This function will have one
+parameter, the current node. This represents the parent of the new created 
+node, that will be placed in the tree. The start_create_tree function will
+be called from the create_tree function with the root as parameter. First I
+see if the node is an operand or an operator. If it is an operator, a new node 
+will be allocated with my_create_node function and the new node will be the
+left son of the current node. The function will enter on recursion with the
+just added node as parameter (the left son). If the extracted string is an
+operand the program will return from recursion. It will be allocated space
+for a new node and this will be connected as the right son of the current
+node. The function will enter on recursion again with the just added node in
+the tree as parameter (the right son).
+    
+    The my_create_node function is a function that allocates space for a node.
+There will be 16 bytes allocated for the node and the data string will be
+allocated with strdup. The new node will be returned in eax. 
+_______________________________________________________________________________
+

@@ -56,7 +56,7 @@ my_create_node: ; allocating space for a node
     enter   0, 0
     push    1
     push    12
-    call    calloc ; allocating 16 bytes for a node
+    call    calloc ; allocating 12 bytes for a node
     add     esp, 8
     push    eax
     push    dword[ebp + 8]

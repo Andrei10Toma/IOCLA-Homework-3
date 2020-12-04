@@ -31,7 +31,7 @@ node. The function will enter on recursion again with the just added node in
 the tree as parameter (the right son).
     
     The my_create_node function is a function that allocates space for a node.
-There will be 16 bytes allocated for the node and the data string will be
+There will be 12 bytes allocated for the node and the data string will be
 allocated with strdup. The new node will be returned in eax. 
 _______________________________________________________________________________
 
